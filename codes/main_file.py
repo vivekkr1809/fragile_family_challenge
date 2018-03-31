@@ -35,9 +35,9 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import make_pipeline
 
 # Import the relevant files for predictions
-# from gpa import compute_gpa as compute_gpa
-# from grit import compute_grit as compute_grit
-# from hardship import compute_hardship as compute_hardship
+import compute_gpa as compute_gpa
+import compute_grit as compute_grit
+import compute_hardship as compute_hardship
 import compute_eviction as compute_eviction
 import compute_layoff as compute_layoff
 import compute_job_training as compute_job_training
@@ -115,7 +115,7 @@ def main():
 	# Extract the challengeID from the training data
 	# The rows corresponding to the challengeIDs will be extracted for creating the
 	# background training data
-	if False:
+	if True:
 		challengeID_train = train_data[train_data.columns[0]].copy()
 		challengeID_train.to_csv('challengeID_train.csv', index=False)
 	else:
@@ -142,13 +142,13 @@ def main():
 	# Call the module to compute and predict the GPA
 
 	# Pass the background data and call the function
-	# compute_gpa.gpa_calculation(train_data, challengeID_train)
+	compute_gpa.gpa_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the Grit
-	# compute_grit.grit_calculation(train_data, challengeID_train)
+	compute_grit.grit_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to train and predict material hardship
-	# compute_hardship.hardship_calculation(train_data, challengeID_train)
+	compute_hardship.hardship_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
 	compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train)	

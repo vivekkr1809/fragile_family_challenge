@@ -1,5 +1,5 @@
 """
-This is the module file to train and predict on layoff data.
+This is the module file to train and predict on gpa data.
 
 Author(s) : Vivek Kumar
             vivekk@princeton.edu
@@ -13,7 +13,6 @@ credited.
 Last Updated : 03-27-2018
 
 """
-
 
 # Import the relevant packages/modules.
 import numpy as np
@@ -29,7 +28,6 @@ from sklearn import feature_selection
 from sklearn import neural_network
 from sklearn.model_selection import train_test_split
 from sklearn  import ensemble
-from sklearn import discriminant_analysis
 from sklearn import metrics
 from sklearn.decomposition import PCA, IncrementalPCA
 from sklearn.preprocessing import StandardScaler
@@ -38,8 +36,8 @@ from sklearn.pipeline import make_pipeline
 
 def prediction_specific_preprocessing(background_data):
 	"Modify the brackground data specific to this prediction"
-	num = background_data._get_numeric_data()
-	num[num < 0] = 1
+	#num = background_data._get_numeric_data()
+	#num[num < 0] = 1
 	return background_data
 
 def extract_backgorund_train(background_train, background_data, challengeID_train):
@@ -54,49 +52,36 @@ def extract_backgorund_train(background_train, background_data, challengeID_trai
 	return background_train
 
 def cross_validate_model(X_train, Y_train):
-
 	"""
 	Here we perform cross validation of models to choose the best one.
 	"""
 	# Divide the training and testing data
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=41)
-	train_n, test_n, y_actual_n, y_predict_n = train_test_split(X_train, Y_train, test_size=0.5, random_state=0)
+	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.4, random_state=42)
 
-	# Add one hot encoder
-	rf = ensemble.RandomForestClassifier(n_estimators=50, max_depth=5)
-	rf_enc = OneHotEncoder()
-	rf_lm = sklinear.LogisticRegression()
-	rf.fit(train, y_actual)
-	rf_enc.fit(rf.apply(train))
-	rf_lm.fit(rf_enc.transform(rf.apply(test)), y_predict)
-	y_predict_rf_lm = rf_lm.predict_proba(rf_enc.transform(rf.apply(test_n)))
-	mse_rf_lm = metrics.mean_squared_error(y_predict_n, y_predict_rf_lm[:,1])
-	print('MSE RandomForestClassifier followed by LogisticRegression is %f' %(mse_rf_lm))
-
-	# List the classification methods to use.
-	clf_quaddis = discriminant_analysis.QuadraticDiscriminantAnalysis()
-	clf_logreg = sklinear.LogisticRegression(penalty='l1')
-	clf_random_forest = ensemble.RandomForestClassifier(n_estimators=50, max_depth = 10)
-	clf_adaboost = ensemble.AdaBoostClassifier(n_estimators = 50)
-	clf_mlpc = neural_network.MLPClassifier()
-	clf_extra_tree = ensemble.ExtraTreesClassifier(n_estimators=50, bootstrap=True)
+	# List the regression methods to use.
+	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=150)
+	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=150)
+	clf_lasso_larscv = sklinear.LassoLarsCV(cv=9)
+	clf_ridge = sklinear.RidgeCV()
+	clf_elastic_net = sklinear.ElasticNet()
+	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=150)
+	clf_mlpr = neural_network.MLPRegressor(solver='adam')
 
 	# Add the above methods in an array
 	# More ameable for looping
-	methods = [clf_quaddis, clf_logreg, clf_random_forest, clf_adaboost, clf_mlpc, clf_extra_tree]
-	methods_label = ['clf_quaddis', 'clf_logreg', 'clf_random_forest', 'clf_adaboost', 'clf_mlpc', 'clf_extra_tree']
+	methods = [clf_random_forest, clf_adaboost_reg, clf_lasso_larscv, clf_elastic_net, clf_extra_tree, clf_mlpr]
+	methods_label = ['clf_random_forest', 'clf_adaboost_reg', 'clf_lasso_larscv', 'clf_elastic_net', 'clf_extra_tree', 'clf_mlpr']
 
 	method_mse = np.zeros((len(methods),1))
 	# Fit and predict for each method
 	for i in range(len(methods)):
 		methods[i].fit(train, y_actual)
-		method_predict = methods[i].predict_proba(test)
-		method_mse[i] = metrics.mean_squared_error(y_predict, method_predict[:,1])
+		method_predict = methods[i].predict(test)
+		method_mse[i] = metrics.mean_squared_error(y_predict, method_predict)
 		print('MSE for %s while cross validation : %f' %(methods_label[i], method_mse[i]))
-
+	
 	# We return the method which has the minimum mse
 	return np.argmin(method_mse)
-
 
 def select_feature(x_train, x_test, y_train):
 	"""
@@ -110,14 +95,15 @@ def select_feature(x_train, x_test, y_train):
 	GPA : 320.58s
 	Grit : 280.71
 	Hardship : 288.05
-	layoff : 37.22
+	gpa : 37.22
 
 	Note : Code taken as is from homework 1 submission
 	"""
+
 	# feature selction-mutual info
 	MIC=[]
 	# Mutual info criteria
-	MIC=feature_selection.mutual_info_classif(x_train, y_train)
+	MIC=feature_selection.mutual_info_regression(x_train, y_train)
 	# get most descriptive features (here called good features)
 	good_features=[]
 	for k in range(len(MIC)):
@@ -128,19 +114,6 @@ def select_feature(x_train, x_test, y_train):
 	x_test=x_test[:,good_features]
 	print(len(good_features))
 	return x_train, x_test
-
-def select_k_best(X_train, X_test, Y_train):
-	"""
-	This function selects the best k features using chi2
-	"""
-	k_features = 5000
-	# Check if the number of features asking for exist
-	# If not then ask for all
-	ch2 = feature_selection.SelectKBest(feature_selection.chi2,k= k_features)
-	
-	X_train = ch2.fit_transform(X_train, Y_train)
-	X_test = ch2.transform(X_test)
-	return X_train , X_test
 
 def perform_pca(X_train, X_test, Y_train):
 	"""
@@ -170,9 +143,9 @@ def perform_pca(X_train, X_test, Y_train):
 
 def perform_one_hotencoding(X_train, X_test, Y_train):
 
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=1)
+	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=42)
 
-	rf = ensemble.RandomForestClassifier(n_estimators=50, max_depth=5)
+	rf = ensemble.RandomForestClassifier(n_estimators=150, max_depth=5)
 	rf_enc = OneHotEncoder()
 	rf_lm = sklinear.LogisticRegression()
 	rf.fit(train, y_actual)
@@ -182,12 +155,8 @@ def perform_one_hotencoding(X_train, X_test, Y_train):
 
 	return y_predict_rf_lm
 
-def prediction_step(background_train, background_test, layoff_data, challengeID_train):
+def prediction_step(background_train, background_test, gpa_data, challengeID_train):
 	
-	# We apply transform to both the training and test set
-	#background_train_np = enc.transform(background_train_np)
-	#background_test_np = enc.transform(background_test_np)
-
 	# Convert the background training and testing to numpy arrays
 	background_train_np = background_train.as_matrix()
 	background_train_np = np.asmatrix(background_train_np)
@@ -195,69 +164,63 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 	background_test_np = background_test.as_matrix()
 	background_test_np = np.asmatrix(background_test_np)
 
-	# Convert the layoff data into matrix and then into a 1-D array
-	layoff_data_np = layoff_data.as_matrix()
-	layoff_data_np = np.asmatrix(layoff_data_np)
-	layoff_data_np = np.ravel(layoff_data_np)
-
+	gpa_data_np = gpa_data.as_matrix()
+	gpa_data_np = np.asmatrix(gpa_data_np)
+	gpa_data_np = np.ravel(gpa_data_np)
 
 	# Perform fecture selection to reduce the number of
 	# required features
-	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, layoff_data_np)
-
-	# Select k-best features
-	background_train_np, background_test_np = select_k_best(background_train_np, background_test_np, layoff_data_np)
+	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, gpa_data_np)
 
 	# Perform principal component analysis
-	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, layoff_data_np)
-
-	# Perform principal random tree embedding
-	# predict_layoff = perform_one_hotencoding(background_train_np, background_test_np, layoff_data_np)
+	#background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, gpa_data_np)
 
 	# Perform Cross Validation
-	# Choose the method to perform the actual prediction using the best performing
-	# scheme
-	position = cross_validate_model(background_train_np, layoff_data_np)
+	position= cross_validate_model(background_train_np, gpa_data_np)
+
 
 	####################################################
 	## Set up the same methods used in cross validation
 	## Fitting twice gives an error hence this way
 	####################################################
 	# List the regression methods to use.
-	clf_quaddis = discriminant_analysis.QuadraticDiscriminantAnalysis()
-	clf_logreg = sklinear.LogisticRegression(penalty='l1')
-	clf_random_forest = ensemble.RandomForestClassifier(n_estimators=50)
-	clf_adaboost = ensemble.AdaBoostClassifier(n_estimators = 50)
-	clf_mlpc = neural_network.MLPClassifier()
-	clf_extra_tree = ensemble.ExtraTreesClassifier(n_estimators=50, bootstrap=True)
+	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=150)
+	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=150)
+	clf_lasso_larscv = sklinear.LassoLarsCV(cv=9)
+	clf_ridge = sklinear.RidgeCV()
+	clf_elastic_net = sklinear.ElasticNet()
+	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=150)
+	clf_mlpr = neural_network.MLPRegressor(solver='adam')
 
 	# Add the above methods in an array
 	# More ameable for looping
-	methods = [clf_quaddis, clf_logreg, clf_random_forest, clf_adaboost, clf_mlpc, clf_extra_tree]
-	methods_label = ['clf_quaddis', 'clf_logreg', 'clf_random_forest', 'clf_adaboost', 'clf_mlpc', 'clf_extra_tree']
-
+	methods = [clf_random_forest, clf_adaboost_reg, clf_lasso_larscv, clf_elastic_net, clf_extra_tree, clf_mlpr]
+	methods_label = ['clf_random_forest', 'clf_adaboost_reg', 'clf_lasso_larscv', 'clf_elastic_net', 'clf_extra_tree', 'clf_mlpr']
+	
+	# Add the position of the classifier
 	method = methods[position]
 	method_label = methods_label[position]
 
 	print('The chosen method is : %s' %(method_label))
 
 	# Predict based on the chosen method
-	method.fit(background_train_np, layoff_data_np)
-	predict_layoff = method.predict_proba(background_test_np)
-	filename = 'predict_layoff_'+method_label+'.csv'
+	method.fit(background_train_np, gpa_data_np)
+	predict_gpa = method.predict(background_test_np)
+	filename = 'predict_gpa_'+method_label+'.csv'
+
+	# If the file exists, delete the file
 	if os.path.isfile(filename) :
 		os.remove(filename)
-
-	for i in range(len(predict_layoff)):
+	# Write to the file
+	for i in range(len(predict_gpa)):
 		file = open(filename,"a+")
-		file.write("%f \r\n" % (predict_layoff[i,1]))
+		file.write("%f \r\n" % (predict_gpa[i]))
 
 	file.close()
 
-def layoff_calculation(path, train_data, background_data, challengeID_train):
+def gpa_calculation(path, train_data, background_data, challengeID_train):
 
-	print('We are computing layoff')
-
+	print('We are computing GPA')
 	start_time = time.time()
 
 	"""
@@ -265,12 +228,14 @@ def layoff_calculation(path, train_data, background_data, challengeID_train):
 	"""
 	background_data = prediction_specific_preprocessing(background_data)
 
+
 	"""
 	Step : Extract the rows from the huge matrix corresponding to the id in the
 	        training data
 	1. Extract the rows of the background data
 	2. Save the background data on which we would train
 	"""
+
 	# Initialize an empty data frame
 	background_train = pd.DataFrame()
 	background_train = extract_backgorund_train(background_train, background_data, challengeID_train)
@@ -278,31 +243,31 @@ def layoff_calculation(path, train_data, background_data, challengeID_train):
 	# The background test data is the whole data set so we do not create another file
 
 	"""
-	Step : Extract and impute the layoff data.
-	1. Extract layoff from training data
-	2. Impute with mode as this is a classification problem.
-		Mean and Mode would not works.
+	Step : Extract and impute the gpa data.
+	1. Extract gpa from training data
+	2. Impute with mean, median and mode.
+	3. Choose the best imputing method based on cross validation.
 	"""
-	layoff_data = train_data[train_data.columns[5]].copy()
-	layoff_data = layoff_data.fillna(layoff_data.mode().iloc[0])
-	
-	
+	#print(train_data)
+	gpa_data = train_data[train_data.columns[1]].copy()
+	gpa_data = gpa_data.fillna(gpa_data.mean())
+		
 	# For this problem we would have to predict everything.
 	# Hence the test case is the complete data set
+	
 	background_test = background_data.copy()
 
 	"""
-	Step : Predict the layoff. 
-	We have to predict the layoff of all the cases and not only the withheld cases
+	Step : Predict the gpa. 
+	We have to predict the gpa of all the cases and not only the withheld cases
 	from the training set.
 	"""
-	prediction_step(background_train, background_test, layoff_data, challengeID_train)
+	prediction_step(background_train, background_test, gpa_data, challengeID_train)
 
-	print 'layoff Runtime:', str(time.time() - start_time)
+	print 'GPA Runtime:', str(time.time() - start_time)
 
 
 if __name__ == '__main__':
-	print('This is the module file for calculating the layoffs.\n\
+	print('This is the module file for calculating the gpas.\n\
 		You must have receievd the main file and a readme to run the entire project.\n\
 		Please contact the Author(s) if this is the only file you have.')
-

@@ -238,8 +238,8 @@ def prediction_step(background_train, background_test, job_training_data, challe
 	print('The chosen method is : %s' %(method_label))
 
 	# Predict based on the chosen method
-	#method.fit(background_train_np, job_training_data_np)
-	#predict_job_training = method.predict_proba(background_test_np)
+	method.fit(background_train_np, job_training_data_np)
+	predict_job_training = method.predict_proba(background_test_np)
 	filename = 'predict_job_training_'+method_label+'.csv'
 	if os.path.isfile(filename) :
 		os.remove(filename)
