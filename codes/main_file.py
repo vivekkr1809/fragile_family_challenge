@@ -42,6 +42,59 @@ from sklearn.pipeline import make_pipeline
 import compute_layoff as compute_layoff
 # from job_training import compute_job_training as compute_job_training
 
+def preprocessing_data(inputcsv, home_path):
+
+	start_time = time.time()
+
+	# read input csv - takes time
+	background_data = pd.read_csv(inputcsv, index_col = False, low_memory=False)
+	# Fix date bug
+	background_data.cf4fint = ((pd.to_datetime(background_data.cf4fint) - pd.to_datetime('1960-01-01')) / np.timedelta64(1, 'D')).astype(int)
+
+	# Replace Empty values with NAN
+	background_data = background_data.replace(r'^\s+$', np.nan, regex=True)	
+
+	# replace NA's with mode
+	background_data = background_data.fillna(background_data.mode().iloc[0])
+	# if still NA, replace with -10
+	background_data = background_data.fillna(value=-10)
+	# replace some important strings with numbers
+	background_data = background_data.replace(to_replace='Other', value = -11)
+	background_data = background_data.replace(to_replace='Missing', value = -12)
+	background_data = background_data.replace(to_replace='never happened', value = -13)
+	background_data = background_data.replace(to_replace='head start', value = -14)
+	background_data = background_data.replace(to_replace='state funded', value = -15)
+	background_data = background_data.replace(to_replace='city funded', value = -16)
+	background_data = background_data.replace(to_replace='time out', value = -17)
+	background_data = background_data.replace(to_replace='m', value = -18)
+	background_data = background_data.replace(to_replace='own children', value = -19)
+	background_data = background_data.replace(to_replace='city/state welfare child care funds', value = -20)
+	background_data = background_data.replace(to_replace='family independence agency', value = -21)
+	background_data = background_data.replace(to_replace='state welfare', value = -22)
+
+	# Extract the columns which are string
+	background_string = background_data.select_dtypes(include='object')
+
+	# Extract the values of the column
+	column_values = list(background_string.columns.values)
+	
+	# Convert the columns with just numbers to float
+	for i in range(len(column_values)):
+		try :
+			background_data[column_values[i]] = background_data[column_values[i]].astype(float)
+		except ValueError:
+			pass
+
+	# Read the background data, excluding the columns which are still object type
+	background_data = background_data.select_dtypes(exclude='object')
+
+	# write filled outputcsv
+	background_data.to_csv(home_path+'/Dropbox/input_files/fragile_family_challenge/background_data.csv', index=False)
+
+	print 'Preprocessing Runtime:', str(time.time() - start_time)
+
+	return background_data
+
 def main():
 
 	# Get the home path
@@ -66,7 +119,15 @@ def main():
 		challengeID_train = train_data[train_data.columns[0]].copy()
 		challengeID_train.to_csv('challengeID_train.csv', index=False)
 	else:
-		challengeID_train = pd.read_csv('challengeID_train.csv', index_col=False, low_memory= False)
+		challengeID_train = pd.read_csv('challengeID_train.csv', header=None, index_col=False, low_memory= False)
+	
+	if False:
+		# Fill the missing data in the background data file
+		# And perform some data cleaning
+		# Since this is a slow and common process we are performing in the main file
+		background_data = preprocessing_data(path+'background.csv', home_path)
+	else:
+		background_data = pd.read_csv(home_path+'/Dropbox/input_files/fragile_family_challenge/background_data.csv', index_col=False, low_memory=False)
 	
 	# Convert the data frame into numpy matrix
 	challengeID_train = challengeID_train.as_matrix()
@@ -93,15 +154,16 @@ def main():
 	# compute_eviction.eviction_calculation(train_data, challengeID_train)	
 
 	# Call the module to compute and predict the eviction
-	compute_layoff.layoff_calculation(path, train_data, challengeID_train)
+	compute_layoff.layoff_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
 	# compute_job_training.job_training_calculation(train_data, challengeID_train)
 
-	# Copy the prediction file
-	prediction_file = pd.read_csv(path+'prediction.csv', index_col=False, low_memory=False)
-	# Empty the prediction file
-	prediction_file = prediction_file.iloc[0:0]
+	if False:
+		# Copy the prediction file
+		prediction_file = pd.read_csv(path+'prediction.csv', index_col=False, low_memory=False)
+		# Empty the prediction file
+		prediction_file.to_csv('prediction.csv', index=False)
 
 	print 'Total Runtime:', str(time.time() - start_time)
 

@@ -36,58 +36,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import make_pipeline
 
-def preprocessing_data(inputcsv):
-
-	start_time = time.time()
-
-	# read input csv - takes time
-	background_data = pd.read_csv(inputcsv, index_col = False, low_memory=False)
-	# Fix date bug
-	background_data.cf4fint = ((pd.to_datetime(background_data.cf4fint) - pd.to_datetime('1960-01-01')) / np.timedelta64(1, 'D')).astype(int)
-
-	# Replace Empty values with NAN
-	background_data = background_data.replace(r'^\s+$', np.nan, regex=True)	
-
-	# replace NA's with mode
-	background_data = background_data.fillna(background_data.mode().iloc[0])
-	# if still NA, replace with -10
-	background_data = background_data.fillna(value=-10)
-	# replace some important strings with numbers
-	background_data = background_data.replace(to_replace='Other', value = -11)
-	background_data = background_data.replace(to_replace='Missing', value = -12)
-	background_data = background_data.replace(to_replace='never happened', value = -13)
-	background_data = background_data.replace(to_replace='head start', value = -14)
-	background_data = background_data.replace(to_replace='state funded', value = -15)
-	background_data = background_data.replace(to_replace='city funded', value = -16)
-	background_data = background_data.replace(to_replace='time out', value = -17)
-	background_data = background_data.replace(to_replace='m', value = -18)
-	background_data = background_data.replace(to_replace='own children', value = -19)
-	background_data = background_data.replace(to_replace='city/state welfare child care funds', value = -20)
-	background_data = background_data.replace(to_replace='family independence agency', value = -21)
-	background_data = background_data.replace(to_replace='state welfare', value = -22)
-
-	# Extract the columns which are string
-	background_string = background_data.select_dtypes(include='object')
-
-	# Extract the values of the column
-	column_values = list(background_string.columns.values)
-	
-	# Convert the columns with just numbers to float
-	for i in range(len(column_values)):
-		try :
-			background_data[column_values[i]] = background_data[column_values[i]].astype(float)
-		except ValueError:
-			pass
-
-	# Replace some negative numbers with some positive values
-	num = background_data._get_numeric_data()
-	num[num < -4] = 1
-
-	# Read the background data, excluding the columns which are still object type
-	background_data = background_data.select_dtypes(exclude='object')
-
-	print 'Preprocessing Runtime:', str(time.time() - start_time)
-
+def prediction_specific_preprocessing(background_data):
+	"Modify the brackground data specific to this prediction"
+	#num = background_data._get_numeric_data()
+	#num[num<-4] = 1
 	return background_data
 
 def extract_backgorund_train(background_train, background_data, challengeID_train):
@@ -101,109 +53,30 @@ def extract_backgorund_train(background_train, background_data, challengeID_trai
 	background_train = background_data.iloc[challengeID_train]
 	return background_train
 
-def extract_impute_layoff(layoff_data, background_train):
-	"""
-	Impute the missing layoff.
-	If a sofisticated method for imputation is desired.
-	Currently not implemented.
-	"""
-
-	"""
-	This is the first naive attempt at imputing the data. We impute
-	the data using mean, median and mode. Choose the method based on MSE.
-	"""
-
-	"""
-	Step : Impute the data using mean
-	"""
-	# replace NA's with mean, median and mode
-	layoff_data_mean = layoff_data.fillna(layoff_data.mean()).copy()
-	layoff_data_median = layoff_data.fillna(layoff_data.median()).copy()
-	layoff_data_mode = layoff_data.fillna(layoff_data.mode().iloc[0]).copy()
-
-	# As a starting point we remove all the object type columns from the
-	# background information
-	background_train = background_train.select_dtypes(exclude='object')	
-	background_train_np = background_train.as_matrix()
-	background_train_np = np.asmatrix(background_train)
-
-	# Mean data
-	layoff_data_mean_np = layoff_data_mean.as_matrix()
-	layoff_data_mean_np = np.asmatrix(layoff_data_mean_np)
-	layoff_data_mean_np = np.ravel(layoff_data_mean_np)
-	mean_train, mean_test, mean_actual, mean_predict = train_test_split(background_train_np, layoff_data_mean_np, test_size=0.4, random_state=0)
-	
-	# Median data
-	layoff_data_median_np = layoff_data_median.as_matrix()
-	layoff_data_median_np = np.asmatrix(layoff_data_median_np)
-	layoff_data_median_np = np.ravel(layoff_data_median_np)
-	median_train, median_test, median_actual, median_predict = train_test_split(background_train_np, layoff_data_median_np, test_size=0.4, random_state=0)
-	
-	# Mode data
-	layoff_data_mode_np = layoff_data_mode.as_matrix()
-	layoff_data_mode_np = np.asmatrix(layoff_data_mode_np)
-	layoff_data_mode_np = np.ravel(layoff_data_mode_np)
-	mode_train, mode_test, mode_actual, mode_predict = train_test_split(background_train_np, layoff_data_mode_np, test_size=0.4, random_state=0)
-	
-	# Predict the training data using random classifier
-	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=100)
-
-	# Fit with mean
-	clf_random_forest.fit(mean_train, mean_actual)
-	y_mean = clf_random_forest.predict(mean_test)
-	mean_mse = metrics.mean_squared_error(mean_predict, y_mean)
-
-	# Fit with median
-	clf_random_forest.fit(median_train, median_actual)
-	y_median = clf_random_forest.predict(median_test)
-	median_mse = metrics.mean_squared_error(median_predict, y_median)
-	
-	# Fit with mode
-	clf_random_forest.fit(mode_train, mode_actual)
-	y_mode = clf_random_forest.predict(mode_test)
-	mode_mse = metrics.mean_squared_error(mode_predict, y_mode)
-	
-	# Choose the method:
-	min_mse = np.amin([[mean_mse, median_mse, mode_mse]])
-	del layoff_data
-	if mean_mse== min_mse:
-		layoff_data = layoff_data_mean
-		print('Mean was selected')
-	elif median_mse==min_mse:
-		layoff_data = layoff_data_median
-		print('Median was selected')
-	else:
-		layoff_data = layoff_data_mode
-		print('Mode was selected')
-
-	layoff_data.to_csv('layoff/layoff_data.csv', index=False)
-
-	return layoff_data
-
 def cross_validate_model(X_train, Y_train):
 
 	"""
 	Here we perform cross validation of models to choose the best one.
 	"""
 	# Divide the training and testing data
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=0)
-	# train_n, test_n, y_actual_n, y_predict_n = train_test_split(X_train, Y_train, test_size=0.5, random_state=42)
+	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=41)
+	train_n, test_n, y_actual_n, y_predict_n = train_test_split(X_train, Y_train, test_size=0.5, random_state=0)
 
 	# Add one hot encoder
-	# rf = ensemble.RandomForestClassifier(n_estimators=50, max_depth=5)
-	# rf_enc = OneHotEncoder()
-	# rf_lm = sklinear.LogisticRegression()
-	# rf.fit(train, y_actual)
-	# rf_enc.fit(rf.apply(train))
-	# rf_lm.fit(rf_enc.transform(rf.apply(train_n)), y_actual_n)
-	# y_predict_rf_lm = rf_lm.predict_proba(rf_enc.transform(rf.apply(test)))
-	# mse_rf_lm = metrics.mean_squared_error(y_predict, y_predict_rf_lm[:,1])
-	# print('MSE RandomForestClassifier followed by LogisticRegression is %f' %(mse_rf_lm))
+	rf = ensemble.RandomForestClassifier(n_estimators=50, max_depth=5)
+	rf_enc = OneHotEncoder()
+	rf_lm = sklinear.LogisticRegression()
+	rf.fit(train, y_actual)
+	rf_enc.fit(rf.apply(train))
+	rf_lm.fit(rf_enc.transform(rf.apply(test)), y_predict)
+	y_predict_rf_lm = rf_lm.predict_proba(rf_enc.transform(rf.apply(test_n)))
+	mse_rf_lm = metrics.mean_squared_error(y_predict_n, y_predict_rf_lm[:,1])
+	print('MSE RandomForestClassifier followed by LogisticRegression is %f' %(mse_rf_lm))
 
 	# List the regression methods to use.
 	clf_quaddis = discriminant_analysis.QuadraticDiscriminantAnalysis()
 	clf_logreg = sklinear.LogisticRegression(penalty='l1')
-	clf_random_forest = ensemble.RandomForestClassifier(n_estimators=50)
+	clf_random_forest = ensemble.RandomForestClassifier(n_estimators=50, max_depth = 10)
 	clf_adaboost = ensemble.AdaBoostClassifier(n_estimators = 50)
 	clf_mlpc = neural_network.MLPClassifier()
 	clf_extra_tree = ensemble.ExtraTreesClassifier(n_estimators=50, bootstrap=True)
@@ -270,21 +143,21 @@ def perform_pca(X_train, X_test, Y_train):
 	X_test = scaler.transform(X_test)
 	# Make principal component model
 	# Set the amount of variance explained
-	#percent = 0.99
-	#pca = PCA(percent)
+	percent = 0.99
+	pca = PCA(percent)
 	# Fit the training data
-	#pca.fit(X_train, Y_train)
-	#print('Number of components required to explain %f of variance are %d' %(percent, pca.n_components_))
+	pca.fit(X_train, Y_train)
+	print('Number of components required to explain %f of variance are %d' %(percent, pca.n_components_))
 
 	# Apply mapping to both training and testing data
-	#X_train = pca.transform(X_train)
-	#X_test = pca.transform(X_test)
+	X_train = pca.transform(X_train)
+	X_test = pca.transform(X_test)
 
 	return X_train, X_test
 
 def perform_one_hotencoding(X_train, X_test, Y_train):
 
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=42)
+	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=1)
 
 	rf = ensemble.RandomForestClassifier(n_estimators=50, max_depth=5)
 	rf_enc = OneHotEncoder()
@@ -311,10 +184,10 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 	background_test_np = background_test.as_matrix()
 	background_test_np = np.asmatrix(background_test_np)
 
+	# Convert the layoff data into matrix and then into a 1-D array
 	layoff_data_np = layoff_data.as_matrix()
 	layoff_data_np = np.asmatrix(layoff_data_np)
 	layoff_data_np = np.ravel(layoff_data_np)
-
 
 
 	# Perform fecture selection to reduce the number of
@@ -322,7 +195,7 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, layoff_data_np)
 
 	# Perform principal component analysis
-	#background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, layoff_data_np)
+	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, layoff_data_np)
 
 	# Perform principal random tree embedding
 	#predict_layoff = perform_one_hotencoding(background_train_np, background_test_np, layoff_data_np)
@@ -357,7 +230,7 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 	# Predict based on the chosen method
 	method.fit(background_train_np, layoff_data_np)
 	predict_layoff = method.predict_proba(background_test_np)
-	filename = 'layoff/predict_layoff_'+method_label+'.csv'
+	filename = 'predict_layoff_'+method_label+'.csv'
 	if os.path.isfile(filename) :
 		os.remove(filename)
 
@@ -367,15 +240,16 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 
 	file.close()
 
-def layoff_calculation(path, train_data, challengeID_train):
+def layoff_calculation(path, train_data, background_data, challengeID_train):
 
 	print('We are computing layoff')
 
 	start_time = time.time()
-	
-	# Fill the missing data in the background data file
-	# And perform some data cleaning
-	background_data = preprocessing_data(path+'background.csv')
+
+	"""
+	Step : Perform some prediction specific data processing
+	"""
+	background_data = prediction_specific_preprocessing(background_data)
 
 	"""
 	Step : Extract the rows from the huge matrix corresponding to the id in the
@@ -383,7 +257,6 @@ def layoff_calculation(path, train_data, challengeID_train):
 	1. Extract the rows of the background data
 	2. Save the background data on which we would train
 	"""
-
 	# Initialize an empty data frame
 	background_train = pd.DataFrame()
 	background_train = extract_backgorund_train(background_train, background_data, challengeID_train)
@@ -404,13 +277,12 @@ def layoff_calculation(path, train_data, challengeID_train):
 	# Hence the test case is the complete data set
 	background_test = background_data.copy()
 
-
 	"""
 	Step : Predict the layoff. 
 	We have to predict the layoff of all the cases and not only the withheld cases
 	from the training set.
 	"""
-	#prediction_step(background_train, background_test, layoff_data, challengeID_train)
+	prediction_step(background_train, background_test, layoff_data, challengeID_train)
 
 	print 'layoff Runtime:', str(time.time() - start_time)
 
