@@ -38,9 +38,9 @@ from sklearn.pipeline import make_pipeline
 # from gpa import compute_gpa as compute_gpa
 # from grit import compute_grit as compute_grit
 # from hardship import compute_hardship as compute_hardship
-# from eviction import compute_eviction as compute_eviction
+import compute_eviction as compute_eviction
 import compute_layoff as compute_layoff
-# from job_training import compute_job_training as compute_job_training
+import compute_job_training as compute_job_training
 
 def preprocessing_data(inputcsv, home_path):
 
@@ -151,13 +151,13 @@ def main():
 	# compute_hardship.hardship_calculation(train_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
-	# compute_eviction.eviction_calculation(train_data, challengeID_train)	
+	compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train)	
 
 	# Call the module to compute and predict the eviction
 	compute_layoff.layoff_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
-	# compute_job_training.job_training_calculation(train_data, challengeID_train)
+	compute_job_training.job_training_calculation(path, train_data, background_data, challengeID_train)
 
 	if False:
 		# Copy the prediction file

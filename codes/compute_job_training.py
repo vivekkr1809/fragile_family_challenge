@@ -1,5 +1,5 @@
 """
-This is the module file to train and predict on layoff data.
+This is the module file to train and predict on job_training data.
 
 Author(s) : Vivek Kumar
             vivekk@princeton.edu
@@ -106,12 +106,6 @@ def select_feature(x_train, x_test, y_train):
 	not expect the selection to result in improved performance. But
 	we expect a reduction in run-time.
 
-	No feature Run Time 
-	GPA : 320.58s
-	Grit : 280.71
-	Hardship : 288.05
-	layoff : 37.22
-
 	Note : Code taken as is from homework 1 submission
 	"""
 	# feature selction-mutual info
@@ -184,7 +178,7 @@ def perform_one_hotencoding(X_train, X_test, Y_train):
 
 
 
-def prediction_step(background_train, background_test, layoff_data, challengeID_train):
+def prediction_step(background_train, background_test, job_training_data, challengeID_train):
 	
 	# We apply transform to both the training and test set
 	#background_train_np = enc.transform(background_train_np)
@@ -197,29 +191,29 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 	background_test_np = background_test.as_matrix()
 	background_test_np = np.asmatrix(background_test_np)
 
-	# Convert the layoff data into matrix and then into a 1-D array
-	layoff_data_np = layoff_data.as_matrix()
-	layoff_data_np = np.asmatrix(layoff_data_np)
-	layoff_data_np = np.ravel(layoff_data_np)
+	# Convert the job_training data into matrix and then into a 1-D array
+	job_training_data_np = job_training_data.as_matrix()
+	job_training_data_np = np.asmatrix(job_training_data_np)
+	job_training_data_np = np.ravel(job_training_data_np)
 
 
 	# Perform fecture selection to reduce the number of
 	# required features
-	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, layoff_data_np)
+	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, job_training_data_np)
 
 	# Select k-best features
-	background_train_np, background_test_np = select_k_best(background_train_np, background_test_np, layoff_data_np)
+	background_train_np, background_test_np = select_k_best(background_train_np, background_test_np, job_training_data_np)
 
 	# Perform principal component analysis
-	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, layoff_data_np)
+	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, job_training_data_np)
 
 	# Perform principal random tree embedding
-	# predict_layoff = perform_one_hotencoding(background_train_np, background_test_np, layoff_data_np)
+	# predict_job_training = perform_one_hotencoding(background_train_np, background_test_np, job_training_data_np)
 
 	# Perform Cross Validation
 	# Choose the method to perform the actual prediction using the best performing
 	# scheme
-	position = cross_validate_model(background_train_np, layoff_data_np)
+	position = cross_validate_model(background_train_np, job_training_data_np)
 
 	####################################################
 	## Set up the same methods used in cross validation
@@ -244,21 +238,21 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 	print('The chosen method is : %s' %(method_label))
 
 	# Predict based on the chosen method
-	#method.fit(background_train_np, layoff_data_np)
-	#predict_layoff = method.predict_proba(background_test_np)
-	filename = 'predict_layoff_'+method_label+'.csv'
+	#method.fit(background_train_np, job_training_data_np)
+	#predict_job_training = method.predict_proba(background_test_np)
+	filename = 'predict_job_training_'+method_label+'.csv'
 	if os.path.isfile(filename) :
 		os.remove(filename)
 
-	for i in range(len(predict_layoff)):
+	for i in range(len(predict_job_training)):
 		file = open(filename,"a+")
-		file.write("%f \r\n" % (predict_layoff[i,1]))
+		file.write("%f \r\n" % (predict_job_training[i,1]))
 
 	file.close()
 
-def layoff_calculation(path, train_data, background_data, challengeID_train):
+def job_training_calculation(path, train_data, background_data, challengeID_train):
 
-	print('We are computing layoff')
+	print('We are computing job_training')
 
 	start_time = time.time()
 
@@ -280,13 +274,13 @@ def layoff_calculation(path, train_data, background_data, challengeID_train):
 	# The background test data is the whole data set so we do not create another file
 
 	"""
-	Step : Extract and impute the layoff data.
-	1. Extract layoff from training data
+	Step : Extract and impute the job_training data.
+	1. Extract job_training from training data
 	2. Impute with mode as this is a classification problem.
 		Mean and Mode would not works.
 	"""
-	layoff_data = train_data[train_data.columns[5]].copy()
-	layoff_data = layoff_data.fillna(layoff_data.mode().iloc[0])
+	job_training_data = train_data[train_data.columns[6]].copy()
+	job_training_data = job_training_data.fillna(job_training_data.mode().iloc[0])
 	
 	
 	# For this problem we would have to predict everything.
@@ -294,17 +288,16 @@ def layoff_calculation(path, train_data, background_data, challengeID_train):
 	background_test = background_data.copy()
 
 	"""
-	Step : Predict the layoff. 
-	We have to predict the layoff of all the cases and not only the withheld cases
+	Step : Predict the job_training. 
+	We have to predict the job_training of all the cases and not only the withheld cases
 	from the training set.
 	"""
-	prediction_step(background_train, background_test, layoff_data, challengeID_train)
+	prediction_step(background_train, background_test, job_training_data, challengeID_train)
 
-	print 'layoff Runtime:', str(time.time() - start_time)
+	print 'job_training Runtime:', str(time.time() - start_time)
 
 
 if __name__ == '__main__':
-	print('This is the module file for calculating the layoffs.\n\
+	print('This is the module file for calculating the job_trainings.\n\
 		You must have receievd the main file and a readme to run the entire project.\n\
 		Please contact the Author(s) if this is the only file you have.')
-
