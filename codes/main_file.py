@@ -89,7 +89,7 @@ def preprocessing_data(inputcsv, home_path):
 	background_data = background_data.select_dtypes(exclude='object')
 
 	# write filled outputcsv
-	background_data.to_csv(home_path+'/Dropbox/input_files/fragile_family_challenge/background_data.csv', index=False)
+	background_data.to_csv(path+'background_data.csv', index=False)
 
 	print 'Preprocessing Runtime:', str(time.time() - start_time)
 
@@ -127,7 +127,7 @@ def main():
 		# Since this is a slow and common process we are performing in the main file
 		background_data = preprocessing_data(path+'background.csv', home_path)
 	else:
-		background_data = pd.read_csv(home_path+'/Dropbox/input_files/fragile_family_challenge/background_data.csv', index_col=False, low_memory=False)
+		background_data = pd.read_csv(path+'background_data.csv', index_col=False, low_memory=False)
 	
 	# Convert the data frame into numpy matrix
 	challengeID_train = challengeID_train.as_matrix()
