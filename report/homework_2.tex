@@ -1,0 +1,57 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{cos424,times}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\graphicspath{{./figures/}} 
+\usepackage{amssymb}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\I}{\mathbb{I}}
+\usepackage{natbib}
+\title{Classification of Review Sentiments}
+
+
+\author{
+Vivek Kumar\\
+Civil and Environmental Engineering\\
+Princeton University\\
+\texttt{vivekk@princeton.edu} \\
+\And
+Victor Charpentier\\
+Civil and Environmental Engineering\\
+Princeton University\\
+\texttt{@princeton.edu} \\
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\section{Introduction}
+\section{Related Work}
+\section{Data Processing}
+\begin{enumerate}
+	\item Build a model for predicting 1-type of variable well.
+	\item GPA, Grit, Material Hardship
+	\begin{enumerate}
+		\item Hypothesis : Positive Environment + Lack of Negative leads to positive GPA + ..
+		\item Hypothesis : Positive Environment + Plus some negativity + ..
+		\item Hypothesis : Negative Environment + Lack of parent + ..
+	\end{enumerate}
+	\item Drop NA values for training: only in case of NA in all.
+\end{enumerate}
+\section{Results}
+\section{Acknowledgement}
+\bibliography{ref}
+\bibliographystyle{plain}
+\end{document}
