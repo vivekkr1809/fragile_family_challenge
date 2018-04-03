@@ -56,7 +56,7 @@ def cross_validate_model(X_train, Y_train):
 	Here we perform cross validation of models to choose the best one.
 	"""
 	# Divide the training and testing data
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.4, random_state = 42)
+	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state = 42)
 
 	# List the regression methods to use.
 	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=50)
@@ -106,8 +106,10 @@ def select_feature(x_train, x_test, y_train):
 	MIC=feature_selection.mutual_info_regression(x_train, y_train)
 	# get most descriptive features (here called good features)
 	good_features=[]
+	scores = []
 	for k in range(len(MIC)):
-		if MIC[k] > 0.01: # Criteria for deciding that feature should be included
+		scores.append(MIC[k])
+		if MIC[k] > 0.1: # Criteria for deciding that feature should be included
 			good_features.append(k)
 	# Adapt the training and testing matrices to good features
 	x_train=x_train[:,good_features]
@@ -170,15 +172,17 @@ def prediction_step(background_train, background_test, hardship_data, challengeI
 
 	# Perform fecture selection to reduce the number of
 	# required features
-	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, hardship_data_np)
-
+	background_train_np, background_test_np, scores = select_feature(background_train_np, background_test_np, hardship_data_np)
+	np.savetxt("feature_selection_hardship_scores.csv", scores, delimiter=",")
 	# Perform principal component analysis
 	# background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, hardship_data_np)
-
+	
 	# Perform Cross Validation
 	position= cross_validate_model(background_train_np, hardship_data_np)
 
 
+	if True:
+		return
 	####################################################
 	## Set up the same methods used in cross validation
 	## Fitting twice gives an error hence this way

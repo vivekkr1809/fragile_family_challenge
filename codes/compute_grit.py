@@ -36,8 +36,8 @@ from sklearn.pipeline import make_pipeline
 
 def prediction_specific_preprocessing(background_data):
 	"Modify the brackground data specific to this prediction"
-	#num = background_data._get_numeric_data()
-	#num[num < 0] = 1
+	num = background_data._get_numeric_data()
+        num[num < -4] = 1
 	return background_data
 
 def extract_backgorund_train(background_train, background_data, challengeID_train):
@@ -56,15 +56,15 @@ def cross_validate_model(X_train, Y_train):
 	Here we perform cross validation of models to choose the best one.
 	"""
 	# Divide the training and testing data
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.4, random_state = 42)
+	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state = 42)
 
 	# List the regression methods to use.
-	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=150)
-	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=150)
+	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=50)
+	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=50)
 	clf_lasso_larscv = sklinear.LassoLarsCV(cv=9)
 	clf_ridge = sklinear.RidgeCV()
 	clf_elastic_net = sklinear.ElasticNet()
-	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=150)
+	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=50)
 	clf_mlpr = neural_network.MLPRegressor()
 
 	# Add the above methods in an array
@@ -106,14 +106,16 @@ def select_feature(x_train, x_test, y_train):
 	MIC=feature_selection.mutual_info_regression(x_train, y_train)
 	# get most descriptive features (here called good features)
 	good_features=[]
+	scores = []
 	for k in range(len(MIC)):
-		if MIC[k] > 0.01: # Criteria for deciding that feature should be included
+		scores.append(MIC[k])
+		if MIC[k] > 0.1: # Criteria for deciding that feature should be included
 			good_features.append(k)
 	# Adapt the training and testing matrices to good features
 	x_train=x_train[:,good_features]
 	x_test=x_test[:,good_features]
 	print(len(good_features))
-	return x_train, x_test
+	return x_train, x_test, scores
 
 def perform_pca(X_train, X_test, Y_train):
 	"""
@@ -129,15 +131,15 @@ def perform_pca(X_train, X_test, Y_train):
 	X_test = scaler.transform(X_test)
 	# Make principal component model
 	# Set the amount of variance explained
-	#percent = 0.99
-	#pca = PCA(percent)
+	percent = 0.99
+	pca = PCA(percent)
 	# Fit the training data
-	#pca.fit(X_train, Y_train)
-	#print('Number of components required to explain %f of variance are %d' %(percent, pca.n_components_))
+	pca.fit(X_train, Y_train)
+	print('Number of components required to explain %f of variance are %d' %(percent, pca.n_components_))
 
 	# Apply mapping to both training and testing data
-	#X_train = pca.transform(X_train)
-	#X_test = pca.transform(X_test)
+	X_train = pca.transform(X_train)
+	X_test = pca.transform(X_test)
 
 	return X_train, X_test
 
@@ -170,15 +172,17 @@ def prediction_step(background_train, background_test, grit_data, challengeID_tr
 
 	# Perform fecture selection to reduce the number of
 	# required features
-	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, grit_data_np)
+	background_train_np, background_test_np, scores = select_feature(background_train_np, background_test_np, grit_data_np)
+	np.savetxt("feature_selection_grit_scores.csv", scores, delimiter=",")
 
 	# Perform principal component analysis
-	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, grit_data_np)
+	# background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, grit_data_np)
 
 	# Perform Cross Validation
 	position= cross_validate_model(background_train_np, grit_data_np)
 
-
+	if True:
+		return
 	####################################################
 	## Set up the same methods used in cross validation
 	## Fitting twice gives an error hence this way
@@ -249,7 +253,7 @@ def grit_calculation(path, train_data, background_data, challengeID_train):
 	3. Choose the best imputing method based on cross validation.
 	"""
 	grit_data = train_data[train_data.columns[2]].copy()
-	grit_data = grit_data.fillna(grit_data.median())	
+	grit_data = grit_data.fillna(grit_data.mean())	
 
 	# For this problem we would have to predict everything.
 	# Hence the test case is the complete data set

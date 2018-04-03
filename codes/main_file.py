@@ -115,7 +115,7 @@ def main():
 	# Extract the challengeID from the training data
 	# The rows corresponding to the challengeIDs will be extracted for creating the
 	# background training data
-	if True:
+	if False:
 		challengeID_train = train_data[train_data.columns[0]].copy()
 		challengeID_train.to_csv('challengeID_train.csv', index=False)
 	else:
@@ -127,7 +127,12 @@ def main():
 		# Since this is a slow and common process we are performing in the main file
 		background_data = preprocessing_data(path+'background.csv', home_path)
 	else:
+		# This reads a panda-data frame
 		background_data = pd.read_csv(path+'background_data.csv', index_col=False, low_memory=False)
+		use_pandas = 1
+		# This reads the already prepared numpy file
+		#background_data = np.genfromtxt(path+'background_NoConstant_fillNeg.csv', delimiter = ',')
+		#use_pandas = 0
 	
 	# Convert the data frame into numpy matrix
 	challengeID_train = challengeID_train.as_matrix()
@@ -151,13 +156,13 @@ def main():
 	compute_hardship.hardship_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
-	compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train)	
+	# compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train, use_pandas)	
 
 	# Call the module to compute and predict the eviction
-	compute_layoff.layoff_calculation(path, train_data, background_data, challengeID_train)
+	#compute_layoff.layoff_calculation(path, train_data, background_data, challengeID_train, use_pandas)
 
 	# Call the module to compute and predict the eviction
-	compute_job_training.job_training_calculation(path, train_data, background_data, challengeID_train)
+	#compute_job_training.job_training_calculation(path, train_data, background_data, challengeID_train, use_pandas)
 
 	if False:
 		# Copy the prediction file

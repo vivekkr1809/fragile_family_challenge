@@ -27,7 +27,7 @@ Princeton University\\
 Victor Charpentier\\
 Civil and Environmental Engineering\\
 Princeton University\\
-\texttt{@princeton.edu} \\
+\texttt{vc6@princeton.edu} \\
 }
 
 \newcommand{\fix}{\marginpar{FIX}}
@@ -90,8 +90,11 @@ Finally regression forest is a preferred method due to its speed, efficiency, ab
 	\end{enumerate}
 	\item Drop NA values for training: only in case of NA in all.
 \end{enumerate}
-\section{Discussion of the results}
+\input{sec_results}
 \section{Conclusions}
+Based on the results presented above, it can be concluded that RandomForest is the best regression technique for the continuous variables. Feature selection helps but the reduction in the MSE from the cross-validation suggests not such a great increase in accuracy. However, Performing Principal Component Analysis definitely helps in reduction in computation time. As the data-set becomes larger it would be of paramount importance to perform such dimensionality reductions.
+\section{Acknowledgment}
+We would like to acknowledge the help provided by the COS 424 staff during the completion of this project both through Piazza and through office hours.
 \section{Bibliography}
 \bibliography{ref}
 \bibliographystyle{plain}

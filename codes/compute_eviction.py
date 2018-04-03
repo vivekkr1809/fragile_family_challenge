@@ -36,13 +36,15 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import make_pipeline
 
-def prediction_specific_preprocessing(background_data):
+def prediction_specific_preprocessing(background_data, use_pandas):
 	"Modify the brackground data specific to this prediction"
-	num = background_data._get_numeric_data()
-	num[num < 0] = 1
+	if use_pandas:
+		num = background_data._get_numeric_data()
+		num[num < 0] = 1
+
 	return background_data
 
-def extract_backgorund_train(background_train, background_data, challengeID_train):
+def extract_backgorund_train(background_train, background_data, challengeID_train, use_pandas, path):
 	"""
 	Split the background data into training and testing.
 	In this case the trainging includes the challengeID for
@@ -50,7 +52,10 @@ def extract_backgorund_train(background_train, background_data, challengeID_trai
 	performed on the whole data
 	"""
 	# Copy the background data into background train if challengeID matches
-	background_train = background_data.iloc[challengeID_train]
+	if use_pandas:
+		background_train = background_data.iloc[challengeID_train]
+	else:
+		background_train = np.genfromtxt(path+'background_NoConstant_fillNeg_train.csv', delimiter = ',')
 	return background_train
 
 def cross_validate_model(X_train, Y_train):
@@ -182,19 +187,24 @@ def perform_one_hotencoding(X_train, X_test, Y_train):
 
 
 
-def prediction_step(background_train, background_test, eviction_data, challengeID_train):
+def prediction_step(path, background_train, background_test, eviction_data, challengeID_train, use_pandas):
 	
 	# We apply transform to both the training and test set
 	#background_train_np = enc.transform(background_train_np)
 	#background_test_np = enc.transform(background_test_np)
 
 	# Convert the background training and testing to numpy arrays
-	background_train_np = background_train.as_matrix()
-	background_train_np = np.asmatrix(background_train_np)
 
-	background_test_np = background_test.as_matrix()
-	background_test_np = np.asmatrix(background_test_np)
-
+		
+	if use_pandas:
+		background_train_np = background_train.as_matrix()
+		background_train_np = np.asmatrix(background_train_np)
+		background_test_np = background_test.as_matrix()
+		background_test_np = np.asmatrix(background_test_np)
+	else:
+		background_train_np = background_train
+		background_test_np = background_test
+	
 	eviction_data_np = eviction_data.as_matrix()
 	eviction_data_np = np.asmatrix(eviction_data_np)
 	eviction_data_np = np.ravel(eviction_data_np)
@@ -206,10 +216,10 @@ def prediction_step(background_train, background_test, eviction_data, challengeI
 	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, eviction_data_np)
 
 	# Select k-best features
-	background_train_np, background_test_np = select_k_best(background_train_np, background_test_np, eviction_data_np)
+	#n background_train_np, background_test_np = select_k_best(background_train_np, background_test_np, eviction_data_np)
 
 	# Perform principal component analysis
-	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, eviction_data_np)
+	# background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, eviction_data_np)
 
 	# Perform principal random tree embedding
 	#predict_eviction = perform_one_hotencoding(background_train_np, background_test_np, eviction_data_np)
@@ -254,7 +264,7 @@ def prediction_step(background_train, background_test, eviction_data, challengeI
 	file.close()
 
 
-def eviction_calculation(path, train_data, background_data, challengeID_train):
+def eviction_calculation(path, train_data, background_data, challengeID_train, use_pandas):
 
 	print('We are computing eviction')
 
@@ -262,7 +272,7 @@ def eviction_calculation(path, train_data, background_data, challengeID_train):
 	"""
 	Step : Perform some prediction specific data processing
 	"""
-	background_data = prediction_specific_preprocessing(background_data)
+	background_data = prediction_specific_preprocessing(background_data, use_pandas)
 
 
 	"""
@@ -273,8 +283,11 @@ def eviction_calculation(path, train_data, background_data, challengeID_train):
 	"""
 
 	# Initialize an empty data frame
-	background_train = pd.DataFrame()
-	background_train = extract_backgorund_train(background_train, background_data, challengeID_train)
+	if use_pandas:
+		background_train = pd.DataFrame()
+	else:
+		background_train = []
+	background_train = extract_backgorund_train(background_train, background_data, challengeID_train, use_pandas, path)
 
 	# The background test data is the whole data set so we do not create another file
 
@@ -284,19 +297,26 @@ def eviction_calculation(path, train_data, background_data, challengeID_train):
 	2. Impute with mode as this is a classification problem.
 		Mean and Mode would not works.
 	"""
-	eviction_data = train_data[train_data.columns[4]].copy()
-	eviction_data = eviction_data.fillna(eviction_data.mode().iloc[0])
+	if use_pandas:
+		eviction_data = train_data[train_data.columns[4]].copy()
+		eviction_data = eviction_data.fillna(eviction_data.mode().iloc[0])
+	else:
+		train_data = train_data.dropna(thresh=3)
+		eviction_data = train_data[train_data.columns[4]].copy()
+		eviction_data = eviction_data.fillna(eviction_data.mode().iloc[0])
+
+
+
 	
 	# For this problem we would have to predict everything.
-	# Hence the test case is the complete data set
-	background_test = background_data.copy()
+	# Hence the test case is the complete data set	
 
 	"""
 	Step : Predict the eviction. 
 	We have to predict the eviction of all the cases and not only the withheld cases
 	from the training set.
 	"""
-	prediction_step(background_train, background_test, eviction_data, challengeID_train)
+	prediction_step(path, background_train, background_data, eviction_data, challengeID_train, use_pandas)
 
 	print 'eviction Runtime:', str(time.time() - start_time)
 
