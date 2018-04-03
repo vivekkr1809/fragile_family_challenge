@@ -16,7 +16,11 @@
 \newcommand{\I}{\mathbb{I}}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
+<<<<<<< HEAD
 
+=======
+\usepackage{natbib}
+>>>>>>> 8706caa671fb89373259d921b588dca50c3f7e60
 
 \title{Classification of Review Sentiments}
 
@@ -42,7 +46,10 @@ Princeton University\\
 
 \begin{abstract}
 Applying machine learning techniques for social good is one of the bright outcomes of the technological revolution of the past years. In homework 2 we have performed a prediction and analysis of 6 key outcomes at age 15 of the fragile family challenge. The methods implemented depend on the type of outcome. For each type of outcome over 6 prediction methods are tested. The performance of regressions and classifiers is assessed with xx and receiver operating curves. Overall, the random forest regression methods has the best results for continuous variables and XX has the best result for binary outcomes. Finally, the confidence intervals of the predictors are computed to quantify the quality of the prediction.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8706caa671fb89373259d921b588dca50c3f7e60
 \end{abstract}
 
 \section{Introduction}
@@ -51,15 +58,22 @@ With an increased understanding of the data gained from the challenge, we aim to
 
 
 \section{Description of the Data}
+<<<<<<< HEAD
 In the domains that generate a lot of data, social sciences are maybe one of the least explored by data scientist. Social sciences excel in causal inference, they have handled data from observations for a long time. Data science on the other end has experience with large dataset but is not focused so much on causal inference \cite{grimmer2015we}. The hope of applying machine learning techniques to the FFCWS data-set is to combine both sciences for the understanding of fragile families outcomes. Improving the methods to treat large data-sets is vital for social sciences and the potential outcomes could be transformative for society.
+=======
+In the domains that generate a lot of data, social sciences are maybe one of the least explored by data scientist. Social sciences excel in causal inference, they have handled data from observations for a long time. Data science on the other end has experience with large dataset but is not focused so much on causal inference \cite{grimmer2015we}. The hope of applying machine learning techniques to the FFCWS dataset is to combine both sciences for the understanding of fragile families outcomes. Improving the methods to treat large datasets is vital for social sciences and the potential outcomes could be transformative for society.
+>>>>>>> 8706caa671fb89373259d921b588dca50c3f7e60
 
 Inequalities in the U.S. are threatening the model of the American Dream. Some voices from the highest economic international agencies are calling for a new American Dream, "\textit{based on equality and sustainable growth}" \cite{wef2017}. In this context, understanding what factors positively influence children growing up in some of the most difficult family environments may be key to creating policies more able to grant equal opportunities for all. The study follows an ensemble of nearly 4700 families with children born in 20 cities across the U.S. between 1998 and 2000. The study has an over-representation of non-marital birth compared to national average. The goal of the study is to provide information on the family factors that influence the life of the child  \cite{reichman2001fragile}.
 
 
 \section{Overview of the methods and fit to reference data}
 \subsection{Data wrangling}
+<<<<<<< HEAD
 The input data for the homework consists of two files. The true values of the outcomes for 2121 families and the data set of over 15 000 features for all the 4242 families. As identified in the introduction, feature selection and engineering can be seen as an "art". Therefore we spent some time on making sure the quality of data that was going to be used for prediction was satisfying. 
 The preparation of the true outcomes is a two step process. In the first step, the families that have outcomes values equal to 6 NAs are dropped. The goal of that step was to reduce the skew of the training data toward the average of each outcome. 655 families were removed from the training data as a result. This is a big number but we assume that the missing information of the outcomes carries some meaning. The training outcomes still contain some NA values. However for these cases some of the other outcomes are available. In the second step the dataset is cleaned. First the constant variables provided in the file {\fontfamily{qcr}\selectfont constantVariables.txt} are removed. Some survey weights of the type "\texttt{q5natwt\char`_xxxx}", "\texttt{q5natwtx\char`_xxxx}" and "\texttt{q5citywt\char`_xxxx}" were placed in the list of constant variables. We decided to consider the information embedded in missing data. All values of missing data less than -5 are considered empty from meaning and set to 0. The missing data from -1 to -4 is maintained. Finally the answers of the type "if not in the list specify:" (e.g. \texttt{d3c5a\char`_14ot}) are coded to 1 if there is a string in the cell and to 0 if the cell is empty.
+=======
+>>>>>>> 8706caa671fb89373259d921b588dca50c3f7e60
 \subsection{Prediction}
 \section{Detailed presentation of the regression forest}
 The random forest predictor used for regression, also called regression forest (RF), is based on the stand alone model of decision trees. Decision trees are prone to over fitting and sensitive to missing data. Therefore, a forest stems (pun) from the aggregate of many weak models to produce a better overall prediction. As opposed to a classification forest, a regression forest provides prediction of continuous variables. The input data seen on Figure \ref{fig:rf} is continuous. Therefore the leaf nodes predict real values (as opposed to classes). The data-set is split based on homogeneity of data (with the standard deviation). This leads to subsets of the data contains similar values of the data to predict (cf. Figure \ref{fig:rf}(a)). The similarity is quantified by entropy, a measure of predictability. The form of the predictor can vary once the tree is fully grown. Several types of predictors can be used \cite{criminisi2011decision}. They can be constant, linear, polynomial or probabilistic-linear among others  \ref{fig:RFpredictors}.
@@ -84,7 +98,11 @@ In the case of the constant predictor, the value of the predictor is given by th
 \hat{y}_k = \argmin_y \sum_{i \in D_k} (y-y_i)^2
 \end{equation}
 
+<<<<<<< HEAD
 Two parameters appears as main control nobs of the method: the number of regression trees in the ensemble and the depth of those trees. Each of those parameter has a distinct effect on the prediction. The depth of the trees controls the closeness of the fit. A ensemble of trees of depth 1 will correspond to a linear regression since each tree corresponds to its root node. In comparison, an ensemble of very deep trees will risk being over-fitted. The number of trees in the forest influences the smoothness of the prediction, the more trees the smoother the direction of the prediction. 
+=======
+Two parameters appears as main control nobs of the method: the number of regression trees in the ensemble and the depth of those trees. Each of those parameter has a distinct effect on the prediction. The depth of the trees controls the closeness of the fit. A ensemble of trees of depth 1 will correspond to a linear regression since each tree corresponds to its root node. In comparison, an ensemble of very deep trees will risk being overfitted. The number of trees in the forest influences the smoothness of the prediction, the more trees the smoother the direction of the prediction. 
+>>>>>>> 8706caa671fb89373259d921b588dca50c3f7e60
 Finally regression forest is a preferred method due to its speed, efficiency, ability to cope with missing data and flexibility of use. 
 \section{Presentation of results}
 
@@ -100,9 +118,13 @@ Finally regression forest is a preferred method due to its speed, efficiency, ab
 \end{enumerate}
 \section{Discussion of the results}
 \section{Conclusions}
+<<<<<<< HEAD
 
 
 
+=======
+\section{Bibliography}
+>>>>>>> 8706caa671fb89373259d921b588dca50c3f7e60
 \bibliography{ref}
 \bibliographystyle{plain}
 \end{document}
