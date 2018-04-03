@@ -1,19 +1,22 @@
 \documentclass{article} % For LaTeX2e
+\usepackage[utf8]{inputenc}
 \usepackage{cos424,times}
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{float}
 \usepackage{enumitem}
 \usepackage{hyperref}
+
 \graphicspath{{./figures/}} 
-\usepackage{amssymb}
+
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\D}{\mathbb{D}}
 \newcommand{\I}{\mathbb{I}}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
-\usepackage{natbib}
+
 
 \title{Classification of Review Sentiments}
 
@@ -39,6 +42,7 @@ Princeton University\\
 
 \begin{abstract}
 Applying machine learning techniques for social good is one of the bright outcomes of the technological revolution of the past years. In homework 2 we have performed a prediction and analysis of 6 key outcomes at age 15 of the fragile family challenge. The methods implemented depend on the type of outcome. For each type of outcome over 6 prediction methods are tested. The performance of regressions and classifiers is assessed with xx and receiver operating curves. Overall, the random forest regression methods has the best results for continuous variables and XX has the best result for binary outcomes. Finally, the confidence intervals of the predictors are computed to quantify the quality of the prediction.
+
 \end{abstract}
 
 \section{Introduction}
@@ -47,7 +51,7 @@ With an increased understanding of the data gained from the challenge, we aim to
 
 
 \section{Description of the Data}
-In the domains that generate a lot of data, social sciences are maybe one of the least explored by data scientist. Social sciences excel in causal inference, they have handled data from observations for a long time. Data science on the other end has experience with large dataset but is not focused so much on causal inference \cite{grimmer2015we}. The hope of applying machine learning techniques to the FFCWS dataset is to combine both sciences for the understanding of fragile families outcomes. Improving the methods to treat large datasets is vital for social sciences and the potential outcomes could be transformative for society.
+In the domains that generate a lot of data, social sciences are maybe one of the least explored by data scientist. Social sciences excel in causal inference, they have handled data from observations for a long time. Data science on the other end has experience with large dataset but is not focused so much on causal inference \cite{grimmer2015we}. The hope of applying machine learning techniques to the FFCWS data-set is to combine both sciences for the understanding of fragile families outcomes. Improving the methods to treat large data-sets is vital for social sciences and the potential outcomes could be transformative for society.
 
 Inequalities in the U.S. are threatening the model of the American Dream. Some voices from the highest economic international agencies are calling for a new American Dream, "\textit{based on equality and sustainable growth}" \cite{wef2017}. In this context, understanding what factors positively influence children growing up in some of the most difficult family environments may be key to creating policies more able to grant equal opportunities for all. The study follows an ensemble of nearly 4700 families with children born in 20 cities across the U.S. between 1998 and 2000. The study has an over-representation of non-marital birth compared to national average. The goal of the study is to provide information on the family factors that influence the life of the child  \cite{reichman2001fragile}.
 
@@ -80,7 +84,7 @@ In the case of the constant predictor, the value of the predictor is given by th
 \hat{y}_k = \argmin_y \sum_{i \in D_k} (y-y_i)^2
 \end{equation}
 
-Two parameters appears as main control nobs of the method: the number of regression trees in the ensemble and the depth of those trees. Each of those parameter has a distinct effect on the prediction. The depth of the trees controls the closeness of the fit. A ensemble of trees of depth 1 will correspond to a linear regression since each tree corresponds to its root node. In comparison, an ensemble of very deep trees will risk being overfitted. The number of trees in the forest influences the smoothness of the prediction, the more trees the smoother the direction of the prediction. 
+Two parameters appears as main control nobs of the method: the number of regression trees in the ensemble and the depth of those trees. Each of those parameter has a distinct effect on the prediction. The depth of the trees controls the closeness of the fit. A ensemble of trees of depth 1 will correspond to a linear regression since each tree corresponds to its root node. In comparison, an ensemble of very deep trees will risk being over-fitted. The number of trees in the forest influences the smoothness of the prediction, the more trees the smoother the direction of the prediction. 
 Finally regression forest is a preferred method due to its speed, efficiency, ability to cope with missing data and flexibility of use. 
 \section{Presentation of results}
 
@@ -96,6 +100,9 @@ Finally regression forest is a preferred method due to its speed, efficiency, ab
 \end{enumerate}
 \section{Discussion of the results}
 \section{Conclusions}
+
+
+
 \bibliography{ref}
 \bibliographystyle{plain}
 \end{document}
