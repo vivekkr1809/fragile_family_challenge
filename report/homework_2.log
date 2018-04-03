@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.23)  3 APR 2018 15:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.23)  3 APR 2018 16:35
 entering extended mode
 **./homework_2.tex
 (homework_2.tex
@@ -445,73 +445,75 @@ Package natbib Warning: Citation `wef2017' on page 1 undefined on input line 52
 p}
 
 ]
-<./figures/rf.jpg, id=62, 1860.9525pt x 644.4075pt>
+LaTeX Font Info:    Try loading font information for OT1+qcr on input line 58.
+
+("C:\Users\Victor Charpentier\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tex-g
+yre\ot1qcr.fd"
+File: ot1qcr.fd 2009/09/25 v1.2 font definition file for OT1/qcr
+)
+<./figures/rf.jpg, id=58, 1860.9525pt x 644.4075pt>
 File: ./figures/rf.jpg Graphic file (type jpg)
 <use ./figures/rf.jpg>
-Package pdftex.def Info: ./figures/rf.jpg  used on input line 63.
+Package pdftex.def Info: ./figures/rf.jpg  used on input line 65.
 (pdftex.def)             Requested size: 397.48499pt x 137.64029pt.
-<./figures/rfpredictors.png, id=65, 858.95906pt x 263.10797pt>
-File: ./figures/rfpredictors.png Graphic file (type png)
-<use ./figures/rfpredictors.png>
-Package pdftex.def Info: ./figures/rfpredictors.png  used on input line 70.
-(pdftex.def)             Requested size: 397.48499pt x 121.75377pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[2 <./figures/rf.jpg>] (homework_2.bbl)
+<./figures/rfpredictors.png, id=61, 858.95906pt x 263.10797pt>
+File: ./figures/rfpredictors.png Graphic file (type png)
+<use ./figures/rfpredictors.png>
+Package pdftex.def Info: ./figures/rfpredictors.png  used on input line 72.
+(pdftex.def)             Requested size: 397.48499pt x 121.75377pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[2] (homework_2.bbl [3 <./figures/rf.jpg> <./figures/rfpredictors.png>])
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 99.
-[3 <./figures/rfpredictors.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 99.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 101.
+[4]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 101.
  (homework_2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 99.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 99.
-
-
-Package rerunfilecheck Warning: File `homework_2.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `homework_2.out':
-(rerunfilecheck)             Before: 36508DC06C9B6D0E9F677DA27FA201FB;614
-(rerunfilecheck)             After:  1E4AF0A5E6E98D7FCF50CA8E22AE983F;565.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 99.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 101.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 101.
+Package rerunfilecheck Info: File `homework_2.out' has not changed.
+(rerunfilecheck)             Checksum: 1E4AF0A5E6E98D7FCF50CA8E22AE983F;565.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 101.
  ) 
 Here is how much of TeX's memory you used:
- 7255 strings out of 493303
- 106922 string characters out of 3124127
- 200603 words of memory out of 3000000
- 10682 multiletter control sequences out of 15000+200000
- 16663 words of font info for 38 fonts, out of 3000000 for 9000
+ 7297 strings out of 493303
+ 107678 string characters out of 3124127
+ 201603 words of memory out of 3000000
+ 10719 multiletter control sequences out of 15000+200000
+ 16987 words of font info for 39 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,11n,39p,1258b,327s stack positions out of 5000i,500n,10000p,200000b,50000s
-pdfTeX warning (dest): name{section.8} has been referenced but does not exist
-, replaced by a fixed one
-
-{C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/
-base/8r.enc}<C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/font
-s/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Victor Charpentier/AppData/Loca
-l/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Victo
-r Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
-cmmi5.pfb><C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/
-type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Victor Charpentier/AppData/Local/P
-rograms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Victor Ch
-arpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7
-.pfb><C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
-/public/amsfonts/cm/cmsy10.pfb><C:/Users/Victor Charpentier/AppData/Local/Progr
-ams/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Victor Charpe
-ntier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/courier/ucrr8a.pfb><C:/
-Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/helv
-etic/uhvb8a.pfb><C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/
-fonts/type1/urw/times/utmb8a.pfb><C:/Users/Victor Charpentier/AppData/Local/Pro
-grams/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Victor Charpentier/
-AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on homework_2.pdf (3 pages, 1241909 bytes).
+ 37i,11n,39p,1344b,431s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvip
+s/tex-gyre/q-rmm.enc}{C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX
+ 2.9/fonts/enc/dvips/base/8r.enc}<C:/Users/Victor Charpentier/AppData/Local/Pro
+grams/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Victor Cha
+rpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi1
+0.pfb><C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type
+1/public/amsfonts/cm/cmmi5.pfb><C:/Users/Victor Charpentier/AppData/Local/Progr
+ams/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Victor Charpe
+ntier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pf
+b><C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
+blic/amsfonts/cm/cmr7.pfb><C:/Users/Victor Charpentier/AppData/Local/Programs/M
+iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Victor Charpentie
+r/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C
+:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
+/tex-gyre/qcrr.pfb><C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2
+.9/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Victor Charpentier/AppData/Loca
+l/Programs/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/Victor Char
+pentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/
+Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/time
+s/utmr8a.pfb><C:/Users/Victor Charpentier/AppData/Local/Programs/MiKTeX 2.9/fon
+ts/type1/urw/times/utmri8a.pfb>
+Output written on homework_2.pdf (4 pages, 1266775 bytes).
 PDF statistics:
- 145 PDF objects out of 1000 (max. 8388607)
+ 150 PDF objects out of 1000 (max. 8388607)
  27 named destinations out of 1000 (max. 500000)
- 91 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 83 words of extra memory for PDF output out of 10000 (max. 10000000)
 
