@@ -121,7 +121,7 @@ def select_feature(x_train, x_test, y_train):
 	# get most descriptive features (here called good features)
 	good_features=[]
 	for k in range(len(MIC)):
-		if MIC[k] > 0.01: # Criteria for deciding that feature should be included
+		if MIC[k] > 0.1: # Criteria for deciding that feature should be included
 			good_features.append(k)
 	# Adapt the training and testing matrices to good features
 	x_train=x_train[:,good_features]
@@ -206,10 +206,10 @@ def prediction_step(background_train, background_test, layoff_data, challengeID_
 	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, layoff_data_np)
 
 	# Select k-best features
-	background_train_np, background_test_np = select_k_best(background_train_np, background_test_np, layoff_data_np)
+	#background_train_np, background_test_np = select_k_best(background_train_np, background_test_np, layoff_data_np)
 
 	# Perform principal component analysis
-	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, layoff_data_np)
+	#background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, layoff_data_np)
 
 	# Perform principal random tree embedding
 	# predict_layoff = perform_one_hotencoding(background_train_np, background_test_np, layoff_data_np)

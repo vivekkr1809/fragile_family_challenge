@@ -21,6 +21,7 @@ import sympy as sp
 import sys
 import time
 import os
+import matplotlib.pyplot as plt
 
 # Import the modules for regression
 import sklearn.linear_model as sklinear
@@ -33,6 +34,7 @@ from sklearn.decomposition import PCA, IncrementalPCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import make_pipeline
+from sklearn import cross_validation
 
 def prediction_specific_preprocessing(background_data):
 	"Modify the brackground data specific to this prediction"
@@ -56,15 +58,15 @@ def cross_validate_model(X_train, Y_train):
 	Here we perform cross validation of models to choose the best one.
 	"""
 	# Divide the training and testing data
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.4, random_state=42)
+	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=42)
 
 	# List the regression methods to use.
-	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=150)
-	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=150)
+	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=50)
+	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=50)
 	clf_lasso_larscv = sklinear.LassoLarsCV(cv=9)
 	clf_ridge = sklinear.RidgeCV()
 	clf_elastic_net = sklinear.ElasticNet()
-	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=150)
+	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=50)
 	clf_mlpr = neural_network.MLPRegressor(solver='adam')
 
 	# Add the above methods in an array
@@ -106,14 +108,16 @@ def select_feature(x_train, x_test, y_train):
 	MIC=feature_selection.mutual_info_regression(x_train, y_train)
 	# get most descriptive features (here called good features)
 	good_features=[]
+	scores = []
 	for k in range(len(MIC)):
-		if MIC[k] > 0.01: # Criteria for deciding that feature should be included
+		scores.append(MIC[k])
+		if MIC[k] > 0.1: # Criteria for deciding that feature should be included
 			good_features.append(k)
 	# Adapt the training and testing matrices to good features
 	x_train=x_train[:,good_features]
 	x_test=x_test[:,good_features]
 	print(len(good_features))
-	return x_train, x_test
+	return x_train, x_test, scores
 
 def perform_pca(X_train, X_test, Y_train):
 	"""
@@ -141,19 +145,29 @@ def perform_pca(X_train, X_test, Y_train):
 
 	return X_train, X_test
 
-def perform_one_hotencoding(X_train, X_test, Y_train):
 
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=42)
+def perform_bootstrapping(x_train, y_train):
+	"We perform bootstrapping in this function"
+	plt.figure(figsize=(12,8))
+	x = np.linspace(1, len(y_train) ,num=len(y_train))
+	n_loops = 100
+	y_pred = []
+	for i in range(0, n_loops):
+		train, test, y_actual, y_predict = train_test_split(x_train, y_train, test_size=0.5)   
+		rf = ensemble.RandomForestRegressor(n_estimators=50, max_depth=5)
+		rf.fit(train, y_actual)
+		y_pred.append(rf.predict(x_train))
 
-	rf = ensemble.RandomForestClassifier(n_estimators=150, max_depth=5)
-	rf_enc = OneHotEncoder()
-	rf_lm = sklinear.LogisticRegression()
-	rf.fit(train, y_actual)
-	rf_enc.fit(rf.apply(train))
-	rf_lm.fit(rf_enc.transform(rf.apply(test)), y_predict)
-	y_predict_rf_lm = rf_lm.predict_proba(rf_enc.transform(rf.apply(X_test)))
+	y_pred = np.transpose(y_pred)
+	np.savetxt("bootstrapping.csv", y_pred, delimiter=",")
+	for i in range(0, n_loops):
+		plt.plot(x,y_pred[:,i],color='grey',linewidth = 2.)
+	plt.scatter(x,y_train, marker='o', color='red', zorder=4)
+	
+	plt.savefig('bootstrapping.eps',bbox_inches='tight', format='eps', dpi=1000)
+	plt.show()
+	return 0
 
-	return y_predict_rf_lm
 
 def prediction_step(background_train, background_test, gpa_data, challengeID_train):
 	
@@ -170,26 +184,29 @@ def prediction_step(background_train, background_test, gpa_data, challengeID_tra
 
 	# Perform fecture selection to reduce the number of
 	# required features
-	#background_train_np, background_test_np = select_feature(background_train_np, background_test_np, gpa_data_np)
+	#background_train_np, background_test_np, scores = select_feature(background_train_np, background_test_np, gpa_data_np)
+
+	#np.savetxt("feature_selection_gpa_scores.csv", scores, delimiter=",")
 
 	# Perform principal component analysis
 	#background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, gpa_data_np)
 
 	# Perform Cross Validation
-	position= cross_validate_model(background_train_np, gpa_data_np)
+	#position= cross_validate_model(background_train_np, gpa_data_np)
 
+	perform_bootstrapping(background_train_np, gpa_data_np)
 
 	####################################################
 	## Set up the same methods used in cross validation
 	## Fitting twice gives an error hence this way
 	####################################################
 	# List the regression methods to use.
-	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=150)
-	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=150)
+	clf_random_forest = ensemble.RandomForestRegressor(n_estimators=50)
+	clf_adaboost_reg = ensemble.AdaBoostRegressor(n_estimators=50)
 	clf_lasso_larscv = sklinear.LassoLarsCV(cv=9)
 	clf_ridge = sklinear.RidgeCV()
 	clf_elastic_net = sklinear.ElasticNet()
-	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=150)
+	clf_extra_tree = ensemble.ExtraTreesRegressor(n_estimators=50)
 	clf_mlpr = neural_network.MLPRegressor(solver='adam')
 
 	# Add the above methods in an array
