@@ -69,8 +69,8 @@ def cross_validate_model(X_train, Y_train):
 
 	# Add the above methods in an array
 	# More ameable for looping
-	methods = [clf_random_forest, clf_adaboost_reg, clf_extra_tree, clf_mlpr]
-	methods_label = ['clf_random_forest', 'clf_adaboost_reg', 'clf_extra_tree', 'clf_mlpr']
+	methods = [clf_random_forest, clf_adaboost_reg, clf_lasso_larscv, clf_elastic_net, clf_extra_tree, clf_mlpr]
+	methods_label = ['clf_random_forest', 'clf_adaboost_reg', 'clf_lasso_larscv', 'clf_elastic_net', 'clf_extra_tree', 'clf_mlpr']
 
 	method_mse = np.zeros((len(methods),1))
 	# Fit and predict for each method
@@ -143,19 +143,6 @@ def perform_pca(X_train, X_test, Y_train):
 
 	return X_train, X_test
 
-def perform_one_hotencoding(X_train, X_test, Y_train):
-
-	train, test, y_actual, y_predict = train_test_split(X_train, Y_train, test_size=0.5, random_state=42)
-
-	rf = ensemble.RandomForestClassifier(n_estimators=150, max_depth=5)
-	rf_enc = OneHotEncoder()
-	rf_lm = sklinear.LogisticRegression()
-	rf.fit(train, y_actual)
-	rf_enc.fit(rf.apply(train))
-	rf_lm.fit(rf_enc.transform(rf.apply(test)), y_predict)
-	y_predict_rf_lm = rf_lm.predict_proba(rf_enc.transform(rf.apply(X_test)))
-
-	return y_predict_rf_lm
 
 def prediction_step(background_train, background_test, grit_data, challengeID_train):
 	
@@ -176,13 +163,11 @@ def prediction_step(background_train, background_test, grit_data, challengeID_tr
 	np.savetxt("feature_selection_grit_scores.csv", scores, delimiter=",")
 
 	# Perform principal component analysis
-	# background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, grit_data_np)
+	background_train_np, background_test_np = perform_pca(background_train_np, background_test_np, grit_data_np)
 
 	# Perform Cross Validation
 	position= cross_validate_model(background_train_np, grit_data_np)
 
-	if True:
-		return
 	####################################################
 	## Set up the same methods used in cross validation
 	## Fitting twice gives an error hence this way
@@ -198,8 +183,8 @@ def prediction_step(background_train, background_test, grit_data, challengeID_tr
 
 	# Add the above methods in an array
 	# More ameable for looping
-	methods = [clf_random_forest, clf_adaboost_reg, clf_extra_tree, clf_mlpr]
-	methods_label = ['clf_random_forest', 'clf_adaboost_reg', 'clf_extra_tree', 'clf_mlpr']
+	methods = [clf_random_forest, clf_adaboost_reg, clf_lasso_larscv, clf_elastic_net, clf_extra_tree, clf_mlpr]
+	methods_label = ['clf_random_forest', 'clf_adaboost_reg', 'clf_lasso_larscv', 'clf_elastic_net', 'clf_extra_tree', 'clf_mlpr']
 	
 	# Add the position of the classifier
 	method = methods[position]

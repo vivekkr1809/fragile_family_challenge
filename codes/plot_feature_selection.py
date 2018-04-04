@@ -27,7 +27,7 @@ if __name__ == '__main__':
 	plt.rc('font', size=14)
 
 	plt.plot(x,feature_selection_data,'r',linewidth = 2.)
-	plt.title('Mutual Info Regression Score', fontsize = 14)
+	plt.title('Mutual Info Regression Score for GPA', fontsize = 14)
 	plt.xlabel('Feature number', fontsize = 14)
 	plt.ylabel('Mutual Info Score', fontsize = 14)
 	plt.legend(loc='best')

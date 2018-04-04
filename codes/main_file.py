@@ -21,6 +21,7 @@ import sys
 import time
 import os
 import platform
+import matplotlib.pyplot as plt
 
 # Import modules relevant to the regression/classification
 import sklearn.linear_model as sklinear
@@ -129,7 +130,6 @@ def main():
 	else:
 		# This reads a panda-data frame
 		background_data = pd.read_csv(path+'background_data.csv', index_col=False, low_memory=False)
-		use_pandas = 1
 		# This reads the already prepared numpy file
 		#background_data = np.genfromtxt(path+'background_NoConstant_fillNeg.csv', delimiter = ',')
 		#use_pandas = 0
@@ -147,28 +147,22 @@ def main():
 	# Call the module to compute and predict the GPA
 
 	# Pass the background data and call the function
-	compute_gpa.gpa_calculation(path, train_data, background_data, challengeID_train)
+	# compute_gpa.gpa_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the Grit
-	compute_grit.grit_calculation(path, train_data, background_data, challengeID_train)
+	# compute_grit.grit_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to train and predict material hardship
-	compute_hardship.hardship_calculation(path, train_data, background_data, challengeID_train)
+	# compute_hardship.hardship_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
-	# compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train, use_pandas)	
+	compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train)	
 
 	# Call the module to compute and predict the eviction
-	#compute_layoff.layoff_calculation(path, train_data, background_data, challengeID_train, use_pandas)
+	compute_layoff.layoff_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
-	#compute_job_training.job_training_calculation(path, train_data, background_data, challengeID_train, use_pandas)
-
-	if False:
-		# Copy the prediction file
-		prediction_file = pd.read_csv(path+'prediction.csv', index_col=False, low_memory=False)
-		# Empty the prediction file
-		prediction_file.to_csv('prediction.csv', index=False)
+	compute_job_training.job_training_calculation(path, train_data, background_data, challengeID_train)
 
 	print 'Total Runtime:', str(time.time() - start_time)
 
