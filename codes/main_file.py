@@ -52,7 +52,7 @@ def preprocessing_data(inputcsv, home_path):
 	background_data.cf4fint = ((pd.to_datetime(background_data.cf4fint) - pd.to_datetime('1960-01-01')) / np.timedelta64(1, 'D')).astype(int)
 
 	# Replace Empty values with NAN
-	background_data = background_data.replace(r'^\s+$', np.nan, regex=True)	
+	background_data = background_data.replace(r'^\s+$', np.nan, regex=True)
 
 	# replace NA's with mode
 	background_data = background_data.fillna(background_data.mode().iloc[0])
@@ -77,7 +77,7 @@ def preprocessing_data(inputcsv, home_path):
 
 	# Extract the values of the column
 	column_values = list(background_string.columns.values)
-	
+
 	# Convert the columns with just numbers to float
 	for i in range(len(column_values)):
 		try :
@@ -107,11 +107,11 @@ def main():
 	# 1. train.csv
 	# 2. background.csv
 
-	path = home_path+'/Dropbox/Princeton/2017-18/cos_424/homework/homework_2/FFChallenge_v4/'
+	path = 'C:\Users\Victor Charpentier\Google Drive\PhD\cos424\Homework2\FFChallenge_v4/'
 
 	# Read the train csv file into pandas dataframe
 	train_data = pd.read_csv(path+'train.csv', index_col=False, low_memory=False)
-	
+
 	# Extract the challengeID from the training data
 	# The rows corresponding to the challengeIDs will be extracted for creating the
 	# background training data
@@ -120,7 +120,7 @@ def main():
 		challengeID_train.to_csv('challengeID_train.csv', index=False)
 	else:
 		challengeID_train = pd.read_csv('challengeID_train.csv', header=None, index_col=False, low_memory= False)
-	
+
 	if False:
 		# Fill the missing data in the background data file
 		# And perform some data cleaning
@@ -128,7 +128,7 @@ def main():
 		background_data = preprocessing_data(path+'background.csv', home_path)
 	else:
 		background_data = pd.read_csv(path+'background_data.csv', index_col=False, low_memory=False)
-	
+
 	# Convert the data frame into numpy matrix
 	challengeID_train = challengeID_train.as_matrix()
 	challengeID_train = np.asmatrix(challengeID_train)
@@ -151,7 +151,7 @@ def main():
 	compute_hardship.hardship_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
-	compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train)	
+	compute_eviction.eviction_calculation(path, train_data, background_data, challengeID_train)
 
 	# Call the module to compute and predict the eviction
 	compute_layoff.layoff_calculation(path, train_data, background_data, challengeID_train)
@@ -169,4 +169,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
